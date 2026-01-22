@@ -24,6 +24,8 @@ export function languageInit() {
     sqlLanguageStatus,
     actionProvider
   );
-  
-  return functionality;
+  return {
+    disposables: functionality,
+    hoverProvider
+  };
 }

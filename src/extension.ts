@@ -26,11 +26,12 @@ import { queryHistory } from "./views/queryHistoryView";
 import { registerCopilotProvider } from "./aiProviders/copilot";
 import { registerDb2iTablesProvider } from "./aiProviders/continue/listTablesContextProvider";
 import { setCheckerAvailableContext } from "./language/providers/problemProvider";
+import { hoverProvider } from "./language/providers/hoverProvider";
 
 export interface Db2i {
   sqlJobManager: SQLJobManager,
   sqlJob: (options?: JDBCOptions) => OldSQLJob,
-  languageInit: typeof languageInit
+  hoverProvider: typeof hoverProvider;
 }
 
 // this method is called when your extension is activated
@@ -48,7 +49,7 @@ export function activate(context: vscode.ExtensionContext): Db2i {
   const selfCodesView = new selfCodesResultsView(context);
 
   context.subscriptions.push(
-    ...languageInit(),
+    ...languageInit().disposables,
     ...notebookInit(),
     ServerComponent.initOutputChannel(),
     vscode.window.registerTreeDataProvider(
@@ -122,7 +123,7 @@ export function activate(context: vscode.ExtensionContext): Db2i {
 
   instance.subscribe(context, `disconnected`, `db2i-disconnected`, () => ServerComponent.reset());
 
-  return { sqlJobManager: JobManager, sqlJob: (options?: JDBCOptions) => new OldSQLJob(options) , languageInit};
+  return { sqlJobManager: JobManager, sqlJob: (options?: JDBCOptions) => new OldSQLJob(options) , hoverProvider:hoverProvider};
 }
 
 // this method is called when your extension is deactivated
